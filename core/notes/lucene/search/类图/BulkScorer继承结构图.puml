@@ -1,0 +1,18 @@
+@startuml
+
+abstract class BulkScorer{
+    // 负责一次性给一个区间段内的文档打分
+    ---
+    // 收集所有匹配的文档，并打分
+    +void score(LeafCollector collector, Bits acceptDocs)
+    // 收集一个范围内的文档，并返回max之后下一个可能匹配的文档id的估计值。
+    +{abstract} int score(LeafCollector collector, Bits acceptDocs, int min, int max)
+    // 一个打分代价的估计值。通常是所有匹配文档的总数。
+    +{abstract} long cost()
+}
+
+class DefaultBulkScorer extends BulkScorer{
+    // 简单的包装一个Scorer,
+}
+
+@enduml

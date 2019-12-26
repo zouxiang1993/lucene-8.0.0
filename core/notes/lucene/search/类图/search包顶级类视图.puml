@@ -1,0 +1,98 @@
+@startuml
+note as N1
+Query  : 表示一个查询
+Weight :  ？？
+
+Collector : 用来收集所有的查询结果
+LeafCollector : 用来收集单个segment上的查询结果
+
+BulkScorer : 对单个segment上 一个区间内的文档 批量打分
+Scorer : 可以迭代单个segment上所有匹配的文档，并对每个文档给出一个分数。
+！！！ Scorer中的iterator()方法返回的DISI很重要, 是查询时读取底层文件的关键部分。
+
+Weight存在的意义:  使Query可以重用
+Query中依赖IndexSearcher的状态应该放在Weight中
+依赖LeafReader的状态应该放在Scorer中。
+
+end note
+
+abstract class Query{
+    // 表示一个查询
+    // 如果一个Query rewrite之后依然等于它自身，则这个Query被称作 原始(primitive)Query
+    ---
+    // 重写一个Query, 将其简化为原始Query
+    +Query rewrite(IndexReader reader)
+    // 为该Query构造一个合适的Weight实现。只有原始Query会实现此方法
+    +Weight createWeight(IndexSearcher searcher, ScoreMode scoreMode, float boost)
+
+}
+
+
+abstract class Weight{
+    // 计算查询的权重，并构造查询的打分器(Scorer)
+    // Weight存在的目的是确保查询过程中不会对Query进行修改，因此可以重用Query实例
+    // Query中依赖IndexSearcher的状态应该放在Weight中，
+    // 依赖LeafReader的类应该放在Scorer中。
+    ---
+    + Query getQuery()
+    // 提取Query中出现过的所有term
+    + {abstract} void extractTerms(Set<Term> terms)
+    + {abstract} Explanation explain(LeafReaderContext context, int doc)
+    // 返回一个Scorer, 可以迭代所有匹配的文档，并给出一个得分。
+    + {abstract} Scorer scorer(LeafReaderContext context)
+    +ScorerSupplier scorerSupplier(LeafReaderContext context)
+    +BulkScorer bulkScorer(LeafReaderContext context)
+
+}
+
+abstract class Scorable{
+    // 返回当前正在打分的文档ID
+    +{abstract} int docID()
+    // 返回当前文档的分数
+    +{abstract} float score()
+    ...
+}
+
+abstract class Scorer extends Scorable{
+    // 针对不同类型Query的通用打分功能
+    // 文档的分数通过Similarity实例来计算
+    ---
+    +Weight getWeight()
+    // 返回所有匹配文档的DISI
+    +{abstract} DocIdSetIterator iterator()
+    +TwoPhaseIterator twoPhaseIterator()
+    //
+    +{abstract} float getMaxScore(int upTo)
+}
+
+interface Collector{
+    // 主要用于在一个查询中收集原始结果，并实现排序或自定义的结果过滤、整理 等
+    ---
+    // 新建一个LeafCollector, 用来收集指定的context
+    +LeafCollector getLeafCollector(LeafReaderContext context)
+    // 打分模式
+    +ScoreMode scoreMode()
+}
+
+interface LeafCollector{
+    // 将打分过程与文档的收集过程解耦
+    // 如果不需要，则可以完全的跳过打分过程。
+    ---
+    // 如果需要打分, 则需要实现此方法, 持有一个Scorer
+    // 然后在每次collect时调用Scorer来进行打分。
+    +void setScorer(Scorable scorer)
+    // 对每个匹配的文档都会调用一次
+    +void collect(int doc)
+}
+
+abstract class BulkScorer{
+    // 负责一次性给一个区间段内的文档打分
+    ---
+    // 收集所有匹配的文档，并打分
+    +void score(LeafCollector collector, Bits acceptDocs)
+    // 收集一个范围内的文档，并返回max之后下一个可能匹配的文档id的估计值。
+    +{abstract} int score(LeafCollector collector, Bits acceptDocs, int min, int max)
+    // 一个打分代价的估计值。通常是所有匹配文档的总数。
+    +{abstract} long cost()
+}
+@enduml

@@ -1,0 +1,50 @@
+@startuml
+participant LeafCollector
+participant Collector
+participant IndexSearcher
+participant Query
+participant Weight
+participant Scorer
+participant BulkScorer
+participant QueryCache
+
+autonumber
+--> IndexSearcher : search(Query query, int n)
+activate IndexSearcher
+    activate IndexSearcher
+        create Collector
+        IndexSearcher --> Collector : new
+        IndexSearcher --> Query : rewrite()
+        IndexSearcher --> Query : createWeight()
+        activate IndexSearcher
+            create Weight
+            Query --> Weight : new
+            IndexSearcher --> QueryCache : doCache
+        deactivate IndexSearcher
+        ==IndexSearcher遍历每一个LeafReader(segment)==
+        IndexSearcher --> Collector : getLeafCollector
+        activate Collector
+            create LeafCollector
+            Collector --> LeafCollector : new
+        deactivate Collector
+        IndexSearcher --> Weight : bulkScorer
+        activate Weight
+            Weight --> Weight : scorer()
+            activate Weight
+                create Scorer
+                Weight --> Scorer : new
+            deactivate Weight
+            create BulkScorer
+            Weight --> BulkScorer : new BulkScorer(Scorer)
+        deactivate Weight
+        IndexSearcher --> BulkScorer : score(LeafCollector, Bits acceptDocs)
+        BulkScorer --> LeafCollector : setScorer()
+        ==BulkScorer遍历每一个文档==
+        BulkScorer --> LeafCollector : collect()
+        LeafCollector --> Scorer : score()
+        activate BulkScorer
+        deactivate BulkScorer
+    deactivate IndexSearcher
+deactivate IndexSearcher
+
+@enduml

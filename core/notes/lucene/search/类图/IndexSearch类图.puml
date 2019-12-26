@@ -1,0 +1,46 @@
+@startuml
+
+class IndexSearcher {
+    // 根据文档id获取文档
+    +Document doc(int docID)
+    +void doc(int docID, StoredFieldVisitor fieldVisitor)
+    +Document doc(int docID, Set<String> fieldsToLoad)
+
+    // 统计满足查询条件的文档总数
+    +int count(Query query)
+
+    // 查询
+    +TopDocs search(Query query, int n)
+    +TopDocs searchAfter(ScoreDoc after, Query query, int numHits)
+    +void search(Query query, Collector results)
+    +TopFieldDocs search(Query query, int n, Sort sort, boolean doDocScores)
+    +TopFieldDocs search(Query query, int n, Sort sort)
+    +TopDocs searchAfter(ScoreDoc after, Query query, int n, Sort sort)
+    +TopFieldDocs searchAfter(ScoreDoc after, Query query, int numHits, Sort sort, boolean doDocScores)
+
+    ---
+    +Query rewrite(Query original)
+    +Explanation explain(Query query, int doc)
+    +Weight createWeight(Query query, ScoreMode scoreMode, float boost)
+
+    ---
+    // Term的统计量
+    +TermStatistics termStatistics(Term term, TermContext context)
+    // 集合层面的统计量
+    +CollectionStatistics collectionStatistics(String field)
+}
+
+class TermStatistics{
+  -BytesRef term;
+  -long docFreq;
+  -long totalTermFreq;
+}
+
+class CollectionStatistics{
+  -String field;
+  -long maxDoc;
+  -long docCount;
+  -long sumTotalTermFreq;
+  -long sumDocFreq;
+}
+@enduml

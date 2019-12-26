@@ -1,0 +1,17 @@
+@startuml
+
+interface LeafCollector{
+    // 将打分过程与文档的收集过程解耦
+    // 如果不需要，则可以完全的跳过打分过程。
+    ---
+    // 如果需要打分, 则需要实现此方法, 持有一个Scorer
+    // 然后在每次collect时调用Scorer来进行打分。
+    +void setScorer(Scorable scorer)
+    // 对每个匹配的文档都会调用一次
+    +void collect(int doc)
+}
+
+abstract class ScorerLeafCollector implements LeafCollector {
+    // 持有一个Scorer的LeafCollector
+}
+@enduml

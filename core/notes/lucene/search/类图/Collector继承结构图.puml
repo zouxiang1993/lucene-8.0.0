@@ -1,0 +1,52 @@
+@startuml
+interface Collector{
+    // 主要用于在一个查询中收集原始结果，并实现排序或自定义的结果过滤、整理 等
+    ---
+    // 新建一个LeafCollector, 用来收集指定的context
+    +LeafCollector getLeafCollector(LeafReaderContext context)
+    // 打分模式
+    +ScoreMode scoreMode()
+}
+
+abstract class TopDocsCollector implements Collector{
+    // 通过使用一个优先级队列来召回结果集中的 topN
+    ---
+    // 匹配此Query的文档总数
+    +int getTotalHits()
+    // 返回指定位置的一批文档
+    +TopDocs topDocs(int start, int howMany)
+}
+
+abstract class TopScoreDocCollector extends TopDocsCollector{
+    // 按得分排序, 返回topN的文档
+}
+
+class SimpleTopScoreDocCollector extends TopScoreDocCollector{
+
+}
+
+class PagingTopScoreDocCollector extends TopScoreDocCollector{
+
+}
+
+abstract class TopFieldCollector extends TopDocsCollector{
+
+}
+
+class TimeLimitingCollector implements Collector{
+
+}
+
+abstract class FilterCollector implements Collector{
+
+}
+
+abstract class CachingCollector extends FilterCollector{
+
+}
+
+class PositiveScoresOnlyCollector extends FilterCollector{
+
+}
+
+@enduml
