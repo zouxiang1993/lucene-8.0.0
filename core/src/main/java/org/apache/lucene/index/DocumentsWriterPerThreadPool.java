@@ -107,9 +107,9 @@ final class DocumentsWriterPerThreadPool {
     }
   }
 
-  private final List<ThreadState> threadStates = new ArrayList<>();
+  private final List<ThreadState> threadStates = new ArrayList<>(); // 有某个线程正在使用的
 
-  private final List<ThreadState> freeList = new ArrayList<>();
+  private final List<ThreadState> freeList = new ArrayList<>();  // 空闲的
 
   private int takenThreadStatePermits = 0;
 

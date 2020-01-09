@@ -3,10 +3,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.*;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MatchAllDocsQuery;
-import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.search.*;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.BytesRef;
@@ -92,5 +89,10 @@ public class IndexWriterTest {
 
         TopDocs topDocs = searcher.search(new TermQuery(new Term("name", "hello")), 10);
         System.out.println(topDocs);
+
+        Explanation explain = searcher.explain(new TermQuery(new Term("name", "hello")), 0);
+        System.out.println(explain);
+
+
     }
 }

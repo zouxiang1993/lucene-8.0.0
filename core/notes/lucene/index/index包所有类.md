@@ -7,10 +7,14 @@ LeafReader -- CodecReader, SegmentReader 等   SegmentCoreReaders !!!
 CompositeReader -- BaseCompositeReader, DirectoryReader, StandardDirectoryReader 等
 
 
+IndexWriter相关
+IndexWriter 
+IndexWriterConfig, LiveIndexWriterConfig
+
+
 索引文件对应的实体类:
 SegmentInfos  SegmentCommitInfo  SegmentInfo 
 FieldInfos FieldInfo
-
 
 
 Fields  MultiFields 
@@ -25,6 +29,9 @@ DocumentWriter相关
     DocumentsWriterPerThread
     DocumentsWriterPerThreadPool
     DocumentsWriterStallControl
+    DocConsumer
+    DefaultIndexingChain
+
 
 IndexDeletionPolicy相关:
     IndexDeletionPolicy 
@@ -33,11 +40,14 @@ IndexDeletionPolicy相关:
     PersistentSnapshotDeletionPolicy
     SnapshotDeletionPolicy
 
-MergePolicy相关: 
+Merge相关: 
     MergePolicy  NoMergePolicy  OneMergeWrappingMergePolicy  SoftDeletesRetentionMergePolicy
     TieredMergePolicy  UpgradeIndexMergePolicy  FilterMergePolicy
     LogByteSizeMergePolicy  LogDocMergePolicy  LogMergePolicy
+    MergeRateLimiter  MergeState  MergeTrigger
 
+FlushPolicy: 
+    FlushPolicy, FlushByRamOrCountsPolicy
 MergeScheduler相关: 
     MergeScheduler  ConcurrentMergeScheduler  NoMergeScheduler  SerialMergeScheduler
 

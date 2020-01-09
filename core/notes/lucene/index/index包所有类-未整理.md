@@ -7,8 +7,6 @@ BitsSlice
 BufferedUpdates
 BufferedUpdatesStream
 CheckIndex
-DefaultIndexingChain
-DocConsumer
 DocIDMerger
 DocsWithFieldSet
 DocValuesFieldUpdates
@@ -24,8 +22,6 @@ FieldUpdatesBuffer
 FilterBinaryDocValues
 FilteredTermsEnum
 FilterNumericDocValues
-FlushByRamOrCountsPolicy
-FlushPolicy
 FreqProxFields
 FreqProxTermsWriter
 FreqProxTermsWriterPerField
@@ -37,16 +33,9 @@ ImpactsSource
 IndexCommit
 IndexFileDeleter
 IndexFileNames
-IndexOptions
 IndexUpgrader
-IndexWriterConfig
-IndexWriter
 LeafMetaData
-LiveIndexWriterConfig
 MappingMultiPostingsEnum
-MergeRateLimiter
-MergeState
-MergeTrigger
 MultiBits
 MultiDocValues
 MultiPostingsEnum

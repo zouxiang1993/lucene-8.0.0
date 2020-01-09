@@ -1,0 +1,42 @@
+@startuml
+participant DWPTPool
+participant FlushControl
+participant DocumentsWriter
+participant DWPT
+participant DocConsumer
+
+autonumber
+--> DocumentsWriter : updateDocument()
+activate DocumentsWriter
+    == 第一阶段, 有锁==
+    DocumentsWriter --> DocumentsWriter : preUpdate()\n是否要flush?
+    activate DocumentsWriter
+    deactivate DocumentsWriter
+
+    DocumentsWriter --> FlushControl : obtainAndLock()
+        FlushControl --> DWPTPool : obtainAndLock() \n 获取ThreadState
+
+    == 第二阶段, 无锁。每个线程都在自己独立的DWPT内写数据==
+    DocumentsWriter --> DocumentsWriter :ensureInitialized
+    activate DocumentsWriter
+        create DWPT
+        DocumentsWriter --> DWPT : 重用或新建
+    deactivate DocumentsWriter
+
+    DocumentsWriter --> DWPT : updateDocuments()
+    activate DWPT
+        DWPT --> DocConsumer : processDocument \n 将一个文档写入内存
+        DWPT --> DWPT : finishDocument
+        activate DWPT
+        deactivate DWPT
+    deactivate DWPT
+
+    == 第三阶段, 有锁 ==
+    DocumentsWriter --> FlushControl : doAfterDocument()\n根据FlushPolicy判断是否将\nThreadState标记为flushPending
+
+    DocumentsWriter --> DocumentsWriter : postUpdate()\n是否要flush?\n是否要merge?
+    activate DocumentsWriter
+    deactivate DocumentsWriter
+
+deactivate DocumentsWriter
+@enduml
