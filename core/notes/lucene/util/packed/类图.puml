@@ -1,0 +1,107 @@
+@startuml
+
+abstract class Reader{
+    只读的、可随机访问的正整数数组
+    ---
+    // 读一个数
+    +{abstract} long get(int index)
+    // 批量读
+    +int get(int index, long[] arr, int off, int len)
+    // 数组中的元素个数
+    +{abstract} int size()
+}
+
+abstract class Mutable extends Reader{
+    // 可修改的数组, 需要提前确定好每个数需要的bit数目
+    ---
+    // 存储每个数所需要的bit数
+    +{abstract} int getBitsPerValue()
+    // 写一个数
+    +{abstract} void set(int index, long value)
+    // 批量写
+    +int set(int index, long[] arr, int off, int len)
+    // 用给定的值来填充
+    +void fill(int fromIndex, int toIndex, long val)
+    // 将整个数组置为0
+    +void clear()
+    // 写出
+    +void save(DataOutput out)
+}
+
+abstract class MutableImpl extends Mutable{
+
+}
+
+class GrowableWriter extends Mutable{
+    // 装饰类, 在内部持有另一个Mutable
+    // 在写入的过程中，如有需要，可以增加bitsPerValue
+}
+
+class Direct8 extends MutableImpl{
+    // 8位的实现
+    // 直接用byte[]
+}
+
+class Direct16 extends MutableImpl{
+    // 16位的实现
+    // 直接用 short[]
+}
+
+class Direct32 extends MutableImpl{
+    // 32位的实现
+    // 直接用int[]
+}
+
+class Direct64 extends MutableImpl{
+    // 64位的实现
+    // 直接用long[]
+}
+
+class 其他 extends MutableImpl{
+    // 还有其他的很多实现
+    // 支持的位数: 1, 2, 3, 4, 5, 6, 7, 8, 9,
+    // 10, 12, 16, 21, 32...
+}
+
+abstract class LongValues{
+    // 表示一个long型数组
+    ---
+    +{abstract} long get(long index)
+}
+
+abstract class AbstractPagedMutable extends LongValues{
+    // 将数据分布到多个固定大小的Mutable中
+    ---
+    Mutable newMutable(int valueCount, int bitsPerValue)
+}
+
+class PagedGrowableWriter extends AbstractPagedMutable{
+    // 使用的Mutable为GrowableWriter
+    // 每个块的bitsPerValue可以各不相同
+}
+
+class PagedMutable extends AbstractPagedMutable{
+    // 每个块的bitsPerValue都相同
+}
+
+class PackedLongValues extends LongValues{
+}
+
+class BlockPackedReader extends LongValues{
+}
+
+class MonotonicBlockPackedReader extends LongValues{
+}
+
+class DeltaPackedLongValues extends PackedLongValues{
+}
+
+class MonotonicLongValues extends DeltaPackedLongValues{
+}
+
+abstract class AbstractBlockPackedWriter{
+}
+
+class BlockPackedWriter extends AbstractBlockPackedWriter{
+}
+@enduml
