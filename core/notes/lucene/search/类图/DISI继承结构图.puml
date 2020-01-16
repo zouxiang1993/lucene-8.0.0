@@ -1,0 +1,42 @@
+@startuml
+
+abstract class DocIdSet{
+    // 表示一批doc id的集合
+    ---
+    // 迭代器
+    +{abstract} DocIdSetIterator iterator()
+    // 返回一个可随机访问的Bits,
+    +Bits bits()
+}
+
+abstract class DocIdSetIterator{
+    // 用来迭代一个doc id集合
+    ---
+    +{abstract} int docID()
+    +{abstract} int nextDoc()
+    +{abstract} int advance(int target)
+}
+
+class BitDocIdSet extends DocIdSet{
+    // 用位集BitSet来实现的
+}
+
+class IntArrayDocIdSet extends DocIdSet{
+    // 用int数组来实现的
+}
+
+class NotDocIdSet extends DocIdSet{
+    // 表示另外一个DocIdSet的否定
+}
+
+abstract class PostingsEnum extends DocIdSetIterator{
+    // 用来迭代倒排表项
+    ---
+    +{abstract} int freq()
+    +{abstract} int nextPosition()
+    +{abstract} int startOffset()
+    +{abstract} int endOffset()
+}
+
+DocIdSet -right[hidden]-- DocIdSetIterator
+@enduml

@@ -1,66 +1,31 @@
 ```text
-DISI:  
-DocIdSet  DocIdSetIterator
-BlockMaxDISI  ConjunctionDISI   ImpactsDISI  FilteredDocIdSetIterator
-DisiPriorityQueue  DisiWrapper  DisjunctionDISIApproximation
+DocIdSet & DocIdSetIterator DISI
 
-Query子类:  
-MultiTermQuery  NGramPhraseQuery  NormsFieldExistsQuery  PhraseQuery  PrefixQuery
-RegexpQuery  BoostQuery  ConstantScoreQuery  DisjunctionMaxQuery  DocValuesFieldExistsQuery
-FuzzyQuery  IndexOrDocValuesQuery  MatchAllDocsQuery  MatchNoDocsQuery  MultiPhraseQuery
-PhraseQueue  PointInSetQuery  PointRangeQuery  SynonymQuery  TermInSetQuery
-TermQuery  TermRangeQuery  WildcardQuery  AutomatonQuery  BlendedTermQuery  BooleanQuery
+Query:  
 
-Weight子类: 
-BooleanWeight  ConstantScoreWeight  FilterWeight  PhraseWeight
+Weight: 
 
-Scorer子类: 
-BlockMaxConjunctionScorer
-Boolean2ScorerSupplier
-BooleanScorer
-BulkScorer
-DisjunctionMaxScorer
-DisjunctionScorer
-DisjunctionSumScorer
-ConjunctionScorer
-FilterScorer
-LeafSimScorer
-MinShouldMatchSumScorer
-PhraseScorer
-ConstantScoreScorer
-ReqExclBulkScorer
-ReqExclScorer
-ReqOptSumScorer
-ScoreCachingWrappingScorer
-Scorer
-ScorerSupplier
-TermScorer
-WANDScorer
+Scorer: 
 
 Collector子类: 
-TimeLimitingCollector
-TopDocsCollector
-TopFieldCollector
-TopScoreDocCollector
-TotalHitCountCollector
-SimpleCollector
-CachingCollector
-FilterCollector
-FilterLeafCollector
-LeafCollector
-PositiveScoresOnlyCollector
-
-MultiCollector
-CollectorManager
-MultiCollectorManager
 
 Cache相关: 
-QueryCache
-LRUQueryCache
-QueryCachingPolicy
-UsageTrackingQueryCachingPolicy
+QueryCache LRUQueryCache
+QueryCachingPolicy UsageTrackingQueryCachingPolicy
+
+
+Matches相关: 
+Matches  DisjunctionMatchesIterator  FilterMatchesIterator
+TermMatchesIterator  MatchesIterator  MatchesUtils
+
+PhraseMatcher  ExactPhraseMatcher  SloppyPhraseMatcher
+
+
+Sort  SortField
+FieldComparatorSource  FieldComparator  
+LeafFieldComparator  SimpleFieldComparator  MultiLeafFieldComparator
+
 
 Rescorer子类: 
-SortRescorer
-QueryRescorer
+SortRescorer  QueryRescorer
 ```

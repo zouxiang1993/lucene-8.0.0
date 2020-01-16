@@ -1,19 +1,20 @@
 @startuml
-note as N1
-Query  : 表示一个查询
-Weight :  ？？
-
-Collector : 用来收集所有的查询结果
-LeafCollector : 用来收集单个segment上的查询结果
-
-BulkScorer : 对单个segment上 一个区间内的文档 批量打分
-Scorer : 可以迭代单个segment上所有匹配的文档，并对每个文档给出一个分数。
+note right of Query
+Query  : 表示用户的一个查询(只与查询本身有关, 与索引无关)
+Weight : 表示一个Query在某个特定的IndexSearcher(或者说是IndexReader)上的得分权重信息,
+    在不同的索引之间, Query的表示应该是完全相同的, 区别都应该存在Weight中。
+Scorer : 可以迭代单个segment(LeafReader)上所有匹配的文档，并对每个文档给出一个分数。
 ！！！ Scorer中的iterator()方法返回的DISI很重要, 是查询时读取底层文件的关键部分。
 
-Weight存在的意义:  使Query可以重用
+Weight存在的目的是确保查询过程中不会对Query进行修改, 这在一些场景下很重要
+例如: 缓存时会可以直接将Query作为缓存的key。
 Query中依赖IndexSearcher的状态应该放在Weight中
 依赖LeafReader的状态应该放在Scorer中。
 
+Collector : 用来收集所有的查询结果
+LeafCollector : 用来收集单个segment上的查询结果, 将打分过程与文档的收集过程解耦
+
+BulkScorer : 对单个segment上 一个区间内的文档 批量打分
 end note
 
 abstract class Query{
@@ -24,9 +25,7 @@ abstract class Query{
     +Query rewrite(IndexReader reader)
     // 为该Query构造一个合适的Weight实现。只有原始Query会实现此方法
     +Weight createWeight(IndexSearcher searcher, ScoreMode scoreMode, float boost)
-
 }
-
 
 abstract class Weight{
     // 计算查询的权重，并构造查询的打分器(Scorer)
@@ -40,20 +39,13 @@ abstract class Weight{
     + {abstract} Explanation explain(LeafReaderContext context, int doc)
     // 返回一个Scorer, 可以迭代所有匹配的文档，并给出一个得分。
     + {abstract} Scorer scorer(LeafReaderContext context)
+    // 返回一个ScorerSupplier, 可以在构造Scorer之前知道它的代价cost
     +ScorerSupplier scorerSupplier(LeafReaderContext context)
     +BulkScorer bulkScorer(LeafReaderContext context)
 
 }
 
-abstract class Scorable{
-    // 返回当前正在打分的文档ID
-    +{abstract} int docID()
-    // 返回当前文档的分数
-    +{abstract} float score()
-    ...
-}
-
-abstract class Scorer extends Scorable{
+abstract class Scorer{
     // 针对不同类型Query的通用打分功能
     // 文档的分数通过Similarity实例来计算
     ---
@@ -61,8 +53,14 @@ abstract class Scorer extends Scorable{
     // 返回所有匹配文档的DISI
     +{abstract} DocIdSetIterator iterator()
     +TwoPhaseIterator twoPhaseIterator()
-    //
     +{abstract} float getMaxScore(int upTo)
+    ---
+    // 继承自父类Scorable
+
+    // 返回当前正在打分的文档ID
+    +{abstract} int docID()
+    // 返回当前文档的分数
+    +{abstract} float score()
 }
 
 interface Collector{
@@ -95,4 +93,10 @@ abstract class BulkScorer{
     // 一个打分代价的估计值。通常是所有匹配文档的总数。
     +{abstract} long cost()
 }
+
+Query -- Weight
+Weight -- Scorer
+Weight -right[hidden]-- LeafCollector
+Collector *-left- LeafCollector
+Scorer -right[hidden]- BulkScorer
 @enduml
