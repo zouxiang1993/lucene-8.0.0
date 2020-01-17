@@ -1,0 +1,61 @@
+@startuml
+
+interface BytesRefIterator {
+    +BytesRef next()
+}
+
+abstract class TermsEnum implements BytesRefIterator{
+    ---
+    // 返回相关的属性
+    +{abstract} AttributeSource attributes()
+    // 精确查找
+    +{abstract} boolean seekExact(BytesRef text)
+    // 定位到 >= text 的第一个词(也有可能定位到末尾)
+    +{abstract} SeekStatus seekCeil(BytesRef text)
+    // 根据ord来定位
+    +{abstract} void seekExact(long ord)
+    // ???
+    +{abstract} void seekExact(BytesRef term, TermState state)
+
+    // 当前位置上的词
+    +{abstract} BytesRef term()
+    // 序号
+    +{abstract} long ord()
+    // 文档频率
+    +{abstract} int docFreq()
+    // 总词频
+    +{abstract} long totalTermFreq()
+    // 倒排行
+    +PostingsEnum postings(PostingsEnum reuse)
+    +{abstract} PostingsEnum postings(PostingsEnum reuse, int flags)
+
+    // ???
+    +{abstract} ImpactsEnum impacts(int flags)
+    // 返回当前TermsEnum的内部状态, 使得下一次查询不再需要re-seeking
+    +{abstract} TermState termState()
+}
+
+abstract class BaseTermsEnum extends TermsEnum{
+
+}
+
+class SegmentTermsEnum extends BaseTermsEnum {
+
+}
+
+class BlockDocsEnum extends PostingsEnum {
+    // 只有文档ID和词频
+}
+
+class BlockPostingsEnum extends PostingsEnum{
+    // 再加上positions
+}
+
+class EverythingEnum extends PostingsEnum{
+    // 再加上offset和payloads
+}
+
+abstract class ImpactsEnum extends PostingsEnum
+
+@enduml
+

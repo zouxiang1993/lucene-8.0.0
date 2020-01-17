@@ -1,6 +1,7 @@
 import org.apache.lucene.codecs.FieldsProducer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.IntPoint;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.*;
 import org.apache.lucene.search.*;
@@ -93,6 +94,61 @@ public class IndexWriterTest {
         Explanation explain = searcher.explain(new TermQuery(new Term("name", "hello")), 0);
         System.out.println(explain);
 
+    }
 
+    @Test
+    public void testRangeQuery() throws IOException {
+        Directory directory = FSDirectory.open(Paths.get("D:\\elasticsearch-env\\lucene-test-dir\\1"));
+        IndexWriterConfig iwc = new IndexWriterConfig();
+        iwc.setUseCompoundFile(false);
+        iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
+
+        IndexWriter indexWriter = new IndexWriter(directory, iwc);
+
+        Document document = new Document();
+        document.add(new TextField("name", "hello world", Field.Store.YES));
+        document.add(new IntPoint("price", 59));
+        indexWriter.addDocument(document);
+
+        document.clear();
+        document.add(new IntPoint("price", 5911));
+        indexWriter.addDocument(document);
+
+        indexWriter.commit();
+
+        IndexReader reader = DirectoryReader.open(indexWriter);
+        IndexSearcher searcher = new IndexSearcher(reader);
+
+        Query q = IntPoint.newRangeQuery("price", 5, 100);
+        TopDocs topDocs = searcher.search(q, 10);
+        System.out.println(topDocs);
+    }
+
+    @Test
+    public void testPointValues() throws IOException {
+        Directory directory = FSDirectory.open(Paths.get("D:\\elasticsearch-env\\lucene-test-dir\\1"));
+        IndexWriterConfig iwc = new IndexWriterConfig();
+        iwc.setUseCompoundFile(false);
+        iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
+
+        IndexWriter indexWriter = new IndexWriter(directory, iwc);
+
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 2000000; i++) {
+            Document document = new Document();
+            document.add(new IntPoint("price", (i % 2 == 0) ? 77 : 99));
+            indexWriter.addDocument(document);
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("总共耗时: " + (end - start) + "ms");
+
+        indexWriter.commit();
+
+        IndexReader reader = DirectoryReader.open(indexWriter);
+        IndexSearcher searcher = new IndexSearcher(reader);
+
+        Query q = IntPoint.newRangeQuery("price", 5, 88);
+        TopDocs topDocs = searcher.search(q, 10);
+        System.out.println(topDocs);
     }
 }
