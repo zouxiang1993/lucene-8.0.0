@@ -17,8 +17,7 @@ SegmentInfos  SegmentCommitInfo  SegmentInfo
 FieldInfos FieldInfo
 
 
-Fields  MultiFields 
-MappedMultiFields
+Fields  MultiFields  MappedMultiFields
 
 
 DocumentWriter相关 
@@ -40,7 +39,9 @@ IndexDeletionPolicy相关:
     PersistentSnapshotDeletionPolicy
     SnapshotDeletionPolicy
 
-Merge相关: 
+Merge相关:
+    MergeScheduler  ConcurrentMergeScheduler  NoMergeScheduler  SerialMergeScheduler
+ 
     MergePolicy  NoMergePolicy  OneMergeWrappingMergePolicy  SoftDeletesRetentionMergePolicy
     TieredMergePolicy  UpgradeIndexMergePolicy  FilterMergePolicy
     LogByteSizeMergePolicy  LogDocMergePolicy  LogMergePolicy
@@ -48,8 +49,5 @@ Merge相关:
 
 FlushPolicy: 
     FlushPolicy, FlushByRamOrCountsPolicy
-MergeScheduler相关: 
-    MergeScheduler  ConcurrentMergeScheduler  NoMergeScheduler  SerialMergeScheduler
-
 
 ```
