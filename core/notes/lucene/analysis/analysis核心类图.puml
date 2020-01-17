@@ -1,0 +1,57 @@
+@startuml
+
+class AttributeSource{
+    // 属性集 (token, position, offset ...)
+    ---
+    // 添加一个属性
+    + .. addAttribute(..)
+    // 捕获当前所有属性的状态, 可用于后续恢复
+    +State captureState()
+    // 恢复每个属性的状态
+    + void restoreState(State state)
+}
+
+abstract class TokenStream extends AttributeSource{
+    // 用来生成并迭代一个token序列
+    ---
+    // 重置所有状态，使之可以重用
+    // 必须在incrementToken()之前调用
+    +void reset()
+    // 迭代到下一个token
+    +{abstract} boolean incrementToken()
+    // 迭代完毕之后执行的操作
+    +void end()
+    // 释放资源
+    +void close()
+}
+
+abstract class Tokenizer extends TokenStream{
+    // 输入是一个Reader
+    ---
+    +void setReader(Reader input)
+}
+
+abstract class TokenFilter extends TokenStream{
+    // 输入是另外一个TokenStream
+}
+
+abstract class CharFilter extends java.io.Reader
+
+abstract class Analyzer {
+    // 用来构造TokenStream
+    ---
+    #{abstract} TokenStreamComponents createComponents(String fieldName)
+    // 分词
+    +TokenStream tokenStream(String fieldName, String text)
+    // 归一化
+    +BytesRef normalize(String fieldName, String text)
+}
+
+
+CharFilter -right[hidden]-- Tokenizer
+TokenFilter -left[hidden]-- Tokenizer
+Analyzer *-up-- "0..n" CharFilter
+Analyzer *-up-- "1" Tokenizer
+Analyzer *-up-- "0..n" TokenFilter
+
+@enduml
