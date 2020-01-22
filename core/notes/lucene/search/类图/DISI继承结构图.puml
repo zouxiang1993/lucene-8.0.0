@@ -30,6 +30,7 @@ class NotDocIdSet extends DocIdSet{
 }
 
 abstract class PostingsEnum extends DocIdSetIterator{
+    // TermQuery的结果
     // 用来迭代倒排表项
     ---
     +{abstract} int freq()
@@ -38,5 +39,5 @@ abstract class PostingsEnum extends DocIdSetIterator{
     +{abstract} int endOffset()
 }
 
-DocIdSet -right[hidden]-- DocIdSetIterator
+DocIdSet -left[hidden]-- DocIdSetIterator
 @enduml

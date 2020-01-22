@@ -47,6 +47,21 @@ abstract class Analyzer {
     +BytesRef normalize(String fieldName, String text)
 }
 
+class TokenStreamComponents{
+    ---
+    // token最开始的源
+    #Consumer<Reader> source
+    // token最终的输出
+    #TokenStream sink
+    ---
+    // 重置tokenStream的源
+    -void setReader(final Reader reader)
+}
+
+abstract class ReuseStrategy{
+    +{abstract} TokenStreamComponents getReusableComponents(Analyzer analyzer, String fieldName)
+    +{abstract} void setReusableComponents(..)
+}
 
 CharFilter -right[hidden]-- Tokenizer
 TokenFilter -left[hidden]-- Tokenizer
